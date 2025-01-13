@@ -2,7 +2,8 @@ package fr.jokay03j.myblog.controller;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.stream.Collectors;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.jokay03j.myblog.model.Article;
@@ -35,6 +37,45 @@ public class ArticleController {
         }
 
         return ResponseEntity.ok(articles);
+    }
+
+    @GetMapping("/search-title")
+    public ResponseEntity<List<Article>> searchTitle(@RequestParam String search) {
+        List<Article> articles = this.repository.findByTitle(search);
+        if (articles.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(articles);
+    }
+
+    @GetMapping("/search-content")
+    public ResponseEntity<List<Article>> getArticlesByContent(@RequestParam String content) {
+        List<Article> articles = this.repository.findByContentContaining(content);
+        if (articles.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(articles);
+    }
+
+    @GetMapping("/search-after")
+    public ResponseEntity<List<Article>> getArticlesCreateAfter(@RequestParam LocalDateTime time) {
+        List<Article> articles = this.repository.findByCreatedAtAfter(time);
+        if (articles.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(articles);
+    }
+
+    @GetMapping("/last")
+    public ResponseEntity<List<Article>> getFiveLastArticles() {
+        List<Article> articles = this.repository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+        if (articles.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(articles.stream().limit(5).collect(Collectors.toList()));
     }
 
     @GetMapping("{id}")
