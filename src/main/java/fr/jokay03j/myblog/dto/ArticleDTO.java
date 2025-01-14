@@ -1,8 +1,11 @@
 package fr.jokay03j.myblog.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import fr.jokay03j.myblog.model.Article;
+import fr.jokay03j.myblog.model.Image;
 
 public class ArticleDTO {
     private Long id;
@@ -11,6 +14,15 @@ public class ArticleDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String categoryName;
+    private List<String> imageUrls;
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
 
     public String getCategoryName() {
         return categoryName;
@@ -69,6 +81,9 @@ public class ArticleDTO {
         dto.setUpdatedAt(article.getUpdatedAt());
         if (article.getCategory() != null) {
             dto.setCategoryName(article.getCategory().getName());
+        }
+        if (article.getImages() != null) {
+            dto.setImageUrls(article.getImages().stream().map(Image::getUrl).collect(Collectors.toList()));
         }
         return dto;
     }

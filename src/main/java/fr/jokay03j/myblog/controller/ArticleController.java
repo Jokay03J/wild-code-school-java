@@ -1,6 +1,7 @@
 package fr.jokay03j.myblog.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Sort;
@@ -19,18 +20,23 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.jokay03j.myblog.dto.ArticleDTO;
 import fr.jokay03j.myblog.model.Article;
 import fr.jokay03j.myblog.model.Category;
+import fr.jokay03j.myblog.model.Image;
 import fr.jokay03j.myblog.repository.ArticleRepository;
 import fr.jokay03j.myblog.repository.CategoryRepository;
+import fr.jokay03j.myblog.repository.ImageRepository;
 
 @RestController
 @RequestMapping("/articles")
 public class ArticleController {
     private final ArticleRepository repository;
     private final CategoryRepository categoryRepository;
+    private final ImageRepository imageRepository;
 
-    public ArticleController(ArticleRepository repository, CategoryRepository categoryRepository) {
+    public ArticleController(ArticleRepository repository, CategoryRepository categoryRepository,
+            ImageRepository imageRepository) {
         this.repository = repository;
         this.categoryRepository = categoryRepository;
+        this.imageRepository = imageRepository;
     }
 
     @GetMapping()
@@ -107,6 +113,24 @@ public class ArticleController {
             article.setCategory(category);
         }
 
+        if (article.getImages() != null && !article.getImages().isEmpty()) {
+            List<Image> validImages = new ArrayList<>();
+            for (Image image : article.getImages()) {
+                if (image.getId() != null) {
+                    Image existingImage = imageRepository.findById(image.getId()).orElse(null);
+                    if (existingImage != null) {
+                        validImages.add(existingImage);
+                    } else {
+                        return ResponseEntity.badRequest().body(null);
+                    }
+                } else {
+                    Image savedImage = imageRepository.save(image);
+                    validImages.add(savedImage);
+                }
+            }
+            article.setImages(validImages);
+        }
+
         Article savedArticle = this.repository.save(article);
         return ResponseEntity.status(HttpStatus.CREATED).body(ArticleDTO.convert(savedArticle));
     }
@@ -129,6 +153,26 @@ public class ArticleController {
                 return ResponseEntity.badRequest().body(null);
             }
             article.setCategory(category);
+        }
+
+        if (article.getImages() != null) {
+            List<Image> validImages = new ArrayList<>();
+            for (Image image : article.getImages()) {
+                if (image.getId() != null) {
+                    Image existingImage = imageRepository.findById(image.getId()).orElse(null);
+                    if (existingImage != null) {
+                        validImages.add(existingImage);
+                    } else {
+                        return ResponseEntity.badRequest().build();
+                    }
+                } else {
+                    Image savedImage = imageRepository.save(image);
+                    validImages.add(savedImage);
+                }
+            }
+            article.setImages(validImages);
+        } else {
+            article.getImages().clear();
         }
 
         Article updatedArticle = this.repository.save(article);
