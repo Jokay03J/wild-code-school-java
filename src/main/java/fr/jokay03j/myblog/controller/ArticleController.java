@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.jokay03j.myblog.dto.ArticleDTO;
 import fr.jokay03j.myblog.model.Article;
 import fr.jokay03j.myblog.model.Category;
 import fr.jokay03j.myblog.repository.ArticleRepository;
@@ -33,14 +34,14 @@ public class ArticleController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Article>> getAllArticles() {
+    public ResponseEntity<List<ArticleDTO>> getAllArticles() {
         List<Article> articles = this.repository.findAll();
 
         if (articles.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(articles);
+        return ResponseEntity.ok(articles.stream().map(ArticleDTO::convert).collect(Collectors.toList()));
     }
 
     @GetMapping("/search-title")
@@ -83,18 +84,18 @@ public class ArticleController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Article> getArticleById(@PathVariable Long id) {
+    public ResponseEntity<ArticleDTO> getArticleById(@PathVariable Long id) {
         Article article = this.repository.findById(id).orElse(null);
 
         if (article == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(article);
+        return ResponseEntity.ok(ArticleDTO.convert(article));
     }
 
     @PostMapping
-    public ResponseEntity<Article> createArticle(@RequestBody Article article) {
+    public ResponseEntity<ArticleDTO> createArticle(@RequestBody Article article) {
         article.setCreatedAt(LocalDateTime.now());
         article.setUpdatedAt(LocalDateTime.now());
 
@@ -107,11 +108,11 @@ public class ArticleController {
         }
 
         Article savedArticle = this.repository.save(article);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedArticle);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ArticleDTO.convert(savedArticle));
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Article> updateArticle(@PathVariable Long id, @RequestBody Article articleBody) {
+    public ResponseEntity<ArticleDTO> updateArticle(@PathVariable Long id, @RequestBody Article articleBody) {
         Article article = this.repository.findById(id).orElse(null);
 
         if (article == null) {
@@ -131,7 +132,7 @@ public class ArticleController {
         }
 
         Article updatedArticle = this.repository.save(article);
-        return ResponseEntity.ok(updatedArticle);
+        return ResponseEntity.ok(ArticleDTO.convert(updatedArticle));
     }
 
     @DeleteMapping("{id}")
