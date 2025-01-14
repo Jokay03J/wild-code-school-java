@@ -17,15 +17,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.jokay03j.myblog.model.Article;
+import fr.jokay03j.myblog.model.Category;
 import fr.jokay03j.myblog.repository.ArticleRepository;
+import fr.jokay03j.myblog.repository.CategoryRepository;
 
 @RestController
 @RequestMapping("/articles")
 public class ArticleController {
     private final ArticleRepository repository;
+    private final CategoryRepository categoryRepository;
 
-    public ArticleController(ArticleRepository repository) {
+    public ArticleController(ArticleRepository repository, CategoryRepository categoryRepository) {
         this.repository = repository;
+        this.categoryRepository = categoryRepository;
     }
 
     @GetMapping()
@@ -93,6 +97,15 @@ public class ArticleController {
     public ResponseEntity<Article> createArticle(@RequestBody Article article) {
         article.setCreatedAt(LocalDateTime.now());
         article.setUpdatedAt(LocalDateTime.now());
+
+        if (article.getCategory() != null) {
+            Category category = this.categoryRepository.findById(article.getCategory().getId()).orElse(null);
+            if (category == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            article.setCategory(category);
+        }
+
         Article savedArticle = this.repository.save(article);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedArticle);
     }
@@ -108,6 +121,15 @@ public class ArticleController {
         article.setContent(articleBody.getContent());
         article.setTitle(articleBody.getTitle());
         article.setUpdatedAt(LocalDateTime.now());
+
+        if (article.getCategory() != null) {
+            Category category = categoryRepository.findById(article.getCategory().getId()).orElse(null);
+            if (category == null) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            article.setCategory(category);
+        }
+
         Article updatedArticle = this.repository.save(article);
         return ResponseEntity.ok(updatedArticle);
     }
