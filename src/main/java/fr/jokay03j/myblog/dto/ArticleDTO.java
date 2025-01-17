@@ -13,8 +13,25 @@ public class ArticleDTO {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String categoryName;
+    private CategoryDTO category;
     private List<String> imageUrls;
+    private List<AuthorDTO> authors;
+
+    public CategoryDTO getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryDTO category) {
+        this.category = category;
+    }
+
+    public List<AuthorDTO> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(List<AuthorDTO> authors) {
+        this.authors = authors;
+    }
 
     public List<String> getImageUrls() {
         return imageUrls;
@@ -22,14 +39,6 @@ public class ArticleDTO {
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
     }
 
     public Long getId() {
@@ -80,11 +89,31 @@ public class ArticleDTO {
         dto.setCreatedAt(article.getCreatedAt());
         dto.setUpdatedAt(article.getUpdatedAt());
         if (article.getCategory() != null) {
-            dto.setCategoryName(article.getCategory().getName());
+            CategoryDTO category = new CategoryDTO();
+            category.setId(article.getCategory().getId());
+            category.setName(article.getCategory().getName());
+            category.setCreatedAt(article.getCategory().getCreatedAt());
+            category.setUpdatedAt(article.getCategory().getUpdatedAt());
+            dto.setCategory(category);
         }
+
         if (article.getImages() != null) {
             dto.setImageUrls(article.getImages().stream().map(Image::getUrl).collect(Collectors.toList()));
         }
+
+        if (article.getArticleAuthors() != null) {
+            dto.setAuthors(article.getArticleAuthors().stream()
+                    .filter(articleAuthor -> articleAuthor.getAuthor() != null)
+                    .map(articleAuthor -> {
+                        AuthorDTO authorDTO = new AuthorDTO();
+                        authorDTO.setId(articleAuthor.getAuthor().getId());
+                        authorDTO.setFirstname(articleAuthor.getAuthor().getFirstname());
+                        authorDTO.setLastname(articleAuthor.getAuthor().getLastname());
+                        return authorDTO;
+                    })
+                    .collect(Collectors.toList()));
+        }
+
         return dto;
     }
 }

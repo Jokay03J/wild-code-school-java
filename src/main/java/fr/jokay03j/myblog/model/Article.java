@@ -32,7 +32,18 @@ public class Article {
     @JoinTable(name = "article_image", joinColumns = @JoinColumn(name = "article_id"), inverseJoinColumns = @JoinColumn(name = "image_id"))
     private List<Image> images;
 
+    @OneToMany(mappedBy = "article")
+    private List<ArticleAuthor> articleAuthors;
+
     // Getters et setters
+
+    public List<ArticleAuthor> getArticleAuthors() {
+        return articleAuthors;
+    }
+
+    public void setArticleAuthors(List<ArticleAuthor> articleAuthors) {
+        this.articleAuthors = articleAuthors;
+    }
 
     public List<Image> getImages() {
         return images;

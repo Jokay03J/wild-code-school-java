@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import fr.jokay03j.myblog.dto.ImageDTO;
 import fr.jokay03j.myblog.model.Article;
 import fr.jokay03j.myblog.model.Image;
-import fr.jokay03j.myblog.repository.ArticleRepository;
 import fr.jokay03j.myblog.repository.ImageRepository;
 
 import java.util.List;
@@ -17,11 +16,9 @@ import java.util.stream.Collectors;
 public class ImageController {
 
     private final ImageRepository imageRepository;
-    private final ArticleRepository articleRepository;
 
-    public ImageController(ImageRepository imageRepository, ArticleRepository articleRepository) {
+    public ImageController(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
-        this.articleRepository = articleRepository;
     }
 
     @GetMapping
