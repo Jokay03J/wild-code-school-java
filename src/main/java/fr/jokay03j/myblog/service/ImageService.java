@@ -47,10 +47,7 @@ public class ImageService {
   }
 
   public Long delete(Long id) {
-    Image image = imageRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Image not found"));
-    if (image == null) {
-      return null;
-    }
+    imageRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Image not found"));
     imageRepository.deleteById(id);
     return id;
   }
