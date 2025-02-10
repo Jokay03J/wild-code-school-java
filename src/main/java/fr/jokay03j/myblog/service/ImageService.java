@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import fr.jokay03j.myblog.dto.ImageDTO;
+import fr.jokay03j.myblog.exception.ResourceNotFoundException;
 import fr.jokay03j.myblog.mapper.ImageMapper;
 import fr.jokay03j.myblog.model.Image;
 import fr.jokay03j.myblog.repository.ImageRepository;
@@ -27,10 +28,8 @@ public class ImageService {
   }
 
   public ImageDTO getOne(Long id) {
-    Image image = imageRepository.findById(id).orElse(null);
-    if (image == null) {
-      return null;
-    }
+    Image image = imageRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Image not found"));
+
     return ImageMapper.convert(image);
   }
 
@@ -40,17 +39,15 @@ public class ImageService {
   }
 
   public ImageDTO update(Long id, Image imageDetails) {
-    Image image = imageRepository.findById(id).orElse(null);
-    if (image == null) {
-      return null;
-    }
+    Image image = imageRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Image not found"));
+
     image.setUrl(imageDetails.getUrl());
     Image savedImage = imageRepository.save(image);
     return ImageMapper.convert(savedImage);
   }
 
   public Long delete(Long id) {
-    Image image = imageRepository.findById(id).orElse(null);
+    Image image = imageRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Image not found"));
     if (image == null) {
       return null;
     }

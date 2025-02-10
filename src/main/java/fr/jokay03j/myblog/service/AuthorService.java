@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import fr.jokay03j.myblog.dto.AuthorDTO;
+import fr.jokay03j.myblog.exception.ResourceNotFoundException;
 import fr.jokay03j.myblog.mapper.AuthorMapper;
 import fr.jokay03j.myblog.model.Author;
 import fr.jokay03j.myblog.repository.AuthorRepository;
@@ -26,7 +27,8 @@ public class AuthorService {
   }
 
   public AuthorDTO getOne(Long id) {
-    Author author = this.authorRepository.findById(id).orElse(null);
+    Author author = this.authorRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
     if (author == null)
       return null;
     return AuthorMapper.convert(author);

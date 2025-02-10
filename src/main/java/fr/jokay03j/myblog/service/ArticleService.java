@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import fr.jokay03j.myblog.dto.ArticleDTO;
+import fr.jokay03j.myblog.exception.ResourceNotFoundException;
 import fr.jokay03j.myblog.mapper.ArticleMapper;
 import fr.jokay03j.myblog.model.Article;
 import fr.jokay03j.myblog.model.ArticleAuthor;
@@ -49,11 +50,8 @@ public class ArticleService {
   }
 
   public ArticleDTO getArticleById(Long id) {
-    Article article = this.articleRepository.findById(id).orElse(null);
-
-    if (article == null) {
-      return null;
-    }
+    Article article = this.articleRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
 
     return ArticleMapper.convert(article);
   }
@@ -63,10 +61,8 @@ public class ArticleService {
     article.setUpdatedAt(LocalDateTime.now());
 
     if (article.getCategory() != null) {
-      Category category = this.categoryRepository.findById(article.getCategory().getId()).orElse(null);
-      if (category == null) {
-        return null;
-      }
+      Category category = this.categoryRepository.findById(article.getCategory().getId())
+          .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
       article.setCategory(category);
     }
 
@@ -74,12 +70,9 @@ public class ArticleService {
       List<Image> validImages = new ArrayList<>();
       for (Image image : article.getImages()) {
         if (image.getId() != null) {
-          Image existingImage = imageRepository.findById(image.getId()).orElse(null);
-          if (existingImage != null) {
-            validImages.add(existingImage);
-          } else {
-            return null;
-          }
+          Image existingImage = imageRepository.findById(image.getId())
+              .orElseThrow(() -> new ResourceNotFoundException("Image not found"));
+          validImages.add(existingImage);
         } else {
           validImages.add(image);
         }
@@ -97,7 +90,8 @@ public class ArticleService {
           return null;
         }
 
-        author = this.authorRepository.findById(author.getId()).orElse(null);
+        author = this.authorRepository.findById(author.getId())
+            .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
 
         articleAuthor.setAuthor(author);
         articleAuthor.setArticle(article);
@@ -110,21 +104,16 @@ public class ArticleService {
   }
 
   public ArticleDTO updateArticle(Article articleBody, Long id) {
-    Article article = this.articleRepository.findById(id).orElse(null);
-
-    if (article == null) {
-      return null;
-    }
+    Article article = this.articleRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
 
     article.setContent(articleBody.getContent());
     article.setTitle(articleBody.getTitle());
     article.setUpdatedAt(LocalDateTime.now());
 
     if (article.getCategory() != null) {
-      Category category = categoryRepository.findById(article.getCategory().getId()).orElse(null);
-      if (category == null) {
-        return null;
-      }
+      Category category = categoryRepository.findById(article.getCategory().getId())
+          .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
       article.setCategory(category);
     }
 
@@ -132,12 +121,10 @@ public class ArticleService {
       List<Image> validImages = new ArrayList<>();
       for (Image image : article.getImages()) {
         if (image.getId() != null) {
-          Image existingImage = imageRepository.findById(image.getId()).orElse(null);
-          if (existingImage != null) {
-            validImages.add(existingImage);
-          } else {
-            return null;
-          }
+          Image existingImage = imageRepository.findById(image.getId())
+              .orElseThrow(() -> new ResourceNotFoundException("Image not found"));
+          validImages.add(existingImage);
+
         } else {
           Image savedImage = imageRepository.save(image);
           validImages.add(savedImage);
@@ -158,10 +145,8 @@ public class ArticleService {
 
       for (ArticleAuthor articleAuthorDetails : article.getArticleAuthors()) {
         Author author = articleAuthorDetails.getAuthor();
-        author = authorRepository.findById(author.getId()).orElse(null);
-        if (author == null) {
-          return null;
-        }
+        author = authorRepository.findById(author.getId())
+            .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
 
         // Créer et associer la nouvelle relation ArticleAuthor
         ArticleAuthor newArticleAuthor = new ArticleAuthor();
@@ -184,11 +169,8 @@ public class ArticleService {
   }
 
   public Long deleteArticle(Long id) {
-    Article article = this.articleRepository.findById(id).orElse(null);
-
-    if (article == null) {
-      return null;
-    }
+    Article article = this.articleRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
 
     this.articleRepository.delete(article);
     return id;

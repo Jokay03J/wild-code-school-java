@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import fr.jokay03j.myblog.dto.CategoryDTO;
+import fr.jokay03j.myblog.exception.ResourceNotFoundException;
 import fr.jokay03j.myblog.mapper.CategoryMapper;
 import fr.jokay03j.myblog.model.Category;
 import fr.jokay03j.myblog.repository.CategoryRepository;
@@ -37,18 +38,15 @@ public class CategoryService {
   }
 
   public CategoryDTO getCategory(Long id) {
-    Category category = this.categoryRepository.findById(id).orElse(null);
-    if (category == null) {
-      return null;
-    }
+    Category category = this.categoryRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
     return CategoryMapper.convert(category);
   }
 
   public CategoryDTO updateCategory(Long id, Category categoryFormData) {
-    Category category = this.categoryRepository.findById(id).orElse(null);
-    if (category == null)
-      return null;
+    Category category = this.categoryRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
     category.setName(categoryFormData.getName());
     category.setUpdatedAt(LocalDateTime.now());
