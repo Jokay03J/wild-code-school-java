@@ -140,23 +140,25 @@ public class ArticleController {
             this.imageRepository.saveAll(validImages);
             article.setImages(validImages);
         }
+        Article savedArticle = this.repository.save(article);
 
         if (article.getArticleAuthors() != null) {
             for (ArticleAuthor articleAuthor : article.getArticleAuthors()) {
                 Author author = articleAuthor.getAuthor();
-                author = this.authorRepository.findById(author.getId()).orElse(null);
+                System.out.println(author);
                 if (author == null) {
                     return ResponseEntity.badRequest().body(null);
                 }
+
+                author = this.authorRepository.findById(author.getId()).orElse(null);
 
                 articleAuthor.setAuthor(author);
                 articleAuthor.setArticle(article);
                 articleAuthor.setContribution(articleAuthor.getContribution());
 
             }
-            this.articleAuthorRepository.saveAll(article.getArticleAuthors());
         }
-        Article savedArticle = this.repository.save(article);
+        this.articleAuthorRepository.saveAll(article.getArticleAuthors());
         return ResponseEntity.status(HttpStatus.CREATED).body(ArticleDTO.convert(savedArticle));
     }
 
