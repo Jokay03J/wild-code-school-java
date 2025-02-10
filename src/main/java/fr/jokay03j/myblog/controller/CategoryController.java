@@ -1,8 +1,6 @@
 package fr.jokay03j.myblog.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,62 +15,55 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.jokay03j.myblog.dto.CategoryDTO;
 import fr.jokay03j.myblog.model.Category;
-import fr.jokay03j.myblog.repository.CategoryRepository;
+import fr.jokay03j.myblog.service.CategoryService;
 
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
-    CategoryRepository categoryRepository;
+    CategoryService categoryService;
 
-    public CategoryController(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
     @GetMapping()
     public ResponseEntity<List<CategoryDTO>> getAll() {
-        List<Category> categories = this.categoryRepository.findAll();
+        List<CategoryDTO> categories = this.categoryService.getAll();
         if (categories.isEmpty())
             return ResponseEntity.noContent().build();
 
-        return ResponseEntity.ok(categories.stream().map(CategoryDTO::convert).collect(Collectors.toList()));
+        return ResponseEntity.ok(categories);
     }
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        category.setCreatedAt(LocalDateTime.now());
-        category.setUpdatedAt(LocalDateTime.now());
-        Category createdCategory = this.categoryRepository.save(category);
+    public ResponseEntity<CategoryDTO> createCategory(@RequestBody Category category) {
+        CategoryDTO createdCategory = this.categoryService.createCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDTO> getCategory(@PathVariable Long id) {
-        Category category = this.categoryRepository.findById(id).orElse(null);
+        CategoryDTO category = this.categoryService.getCategory(id);
         if (category == null)
             return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(CategoryDTO.convert(category));
+        return ResponseEntity.ok(category);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, @RequestBody Category categoryFormData) {
-        Category category = this.categoryRepository.findById(id).orElse(null);
-        if (category == null)
+        CategoryDTO savedCategory = this.categoryService.updateCategory(id, categoryFormData);
+        if (savedCategory == null)
             return ResponseEntity.notFound().build();
 
-        category.setName(categoryFormData.getName());
-        category.setUpdatedAt(LocalDateTime.now());
-        Category savedCategory = this.categoryRepository.save(category);
-
-        return ResponseEntity.ok(CategoryDTO.convert(savedCategory));
+        return ResponseEntity.ok(savedCategory);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Long> deleteCategory(@PathVariable Long id) {
-        Category category = this.categoryRepository.findById(id).orElse(null);
+        Long category = this.categoryService.deleteCategory(id);
 
         if (category == null)
             return ResponseEntity.notFound().build();
-        this.categoryRepository.delete(category);
         return ResponseEntity.noContent().build();
     }
 }

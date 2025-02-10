@@ -2,9 +2,6 @@ package fr.jokay03j.myblog.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import fr.jokay03j.myblog.model.Category;
 
 public class CategoryDTO {
     private Long id;
@@ -51,16 +48,5 @@ public class CategoryDTO {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    static public CategoryDTO convert(Category category) {
-        CategoryDTO dto = new CategoryDTO();
-        dto.setId(category.getId());
-        dto.setName(category.getName());
-        dto.setArticles(category.getArticles().stream().map(ArticleDTO::convert).collect(Collectors.toList()));
-        dto.setCreatedAt(category.getCreatedAt());
-        dto.setUpdatedAt(category.getUpdatedAt());
-        return dto;
-
     }
 }

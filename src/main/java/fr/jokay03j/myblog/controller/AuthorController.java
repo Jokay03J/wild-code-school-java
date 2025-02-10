@@ -1,7 +1,6 @@
 package fr.jokay03j.myblog.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,56 +15,52 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.jokay03j.myblog.dto.AuthorDTO;
 import fr.jokay03j.myblog.model.Author;
-import fr.jokay03j.myblog.repository.AuthorRepository;
+import fr.jokay03j.myblog.service.AuthorService;
 
 @RestController
 @RequestMapping("/authors")
 public class AuthorController {
-    AuthorRepository authorRepository;
+    AuthorService authorService;
 
-    public AuthorController(AuthorRepository authorRepository) {
-        this.authorRepository = authorRepository;
+    public AuthorController(AuthorService authorService) {
+        this.authorService = authorService;
     }
 
     @GetMapping
     public ResponseEntity<List<AuthorDTO>> getAll() {
-        List<Author> authors = this.authorRepository.findAll();
+        List<AuthorDTO> authors = this.authorService.getAll();
         if (authors == null || authors.isEmpty())
             return ResponseEntity.noContent().build();
-        return ResponseEntity.ok(authors.stream().map(AuthorDTO::convert).collect(Collectors.toList()));
+        return ResponseEntity.ok(authors);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<AuthorDTO> getOne(@PathVariable Long id) {
-        Author author = this.authorRepository.findById(id).orElse(null);
+        AuthorDTO author = this.authorService.getOne(id);
         if (author == null)
             return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(AuthorDTO.convert(author));
+        return ResponseEntity.ok(author);
     }
 
     @PostMapping
     public ResponseEntity<AuthorDTO> create(@RequestBody Author authorBody) {
-        Author savedAuthor = this.authorRepository.save(authorBody);
-        return ResponseEntity.status(HttpStatus.CREATED).body(AuthorDTO.convert(savedAuthor));
+        AuthorDTO savedAuthor = this.authorService.create(authorBody);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthor);
     }
 
     @PutMapping("{id}")
     public ResponseEntity<AuthorDTO> update(@PathVariable Long id, @RequestBody Author authorBody) {
-        Author author = this.authorRepository.findById(id).orElse(null);
+        AuthorDTO author = this.authorService.update(id, authorBody);
         if (author == null)
             return ResponseEntity.notFound().build();
-        author.setFirstname(authorBody.getFirstname());
-        author.setLastname(authorBody.getLastname());
-        Author savedAuthor = this.authorRepository.save(author);
-        return ResponseEntity.ok(AuthorDTO.convert(savedAuthor));
+        return ResponseEntity.ok(author);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        Author author = this.authorRepository.findById(id).orElse(null);
+        Long author = this.authorService.delete(id);
         if (author == null)
             return ResponseEntity.notFound().build();
-        this.authorRepository.delete(author);
         return ResponseEntity.noContent().build();
     }
 }
