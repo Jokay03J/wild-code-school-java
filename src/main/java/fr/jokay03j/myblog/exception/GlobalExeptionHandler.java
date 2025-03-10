@@ -43,6 +43,14 @@ public class GlobalExeptionHandler {
         new Error(ex, HttpStatus.BAD_REQUEST, request.getRequestURI(), errors),
         HttpStatus.BAD_REQUEST);
   }
+
+  @ExceptionHandler(BadRequestException.class)
+  public ResponseEntity<Error> handleBadRequest(BadRequestException exception, HttpServletRequest request) {
+    Map<String, String> errors = new HashMap<>();
+    return new ResponseEntity<Error>(
+        new Error(exception, HttpStatus.BAD_REQUEST, request.getRequestURI(), errors),
+        HttpStatus.BAD_REQUEST);
+  }
 }
 
 class Error {
