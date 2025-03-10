@@ -1,6 +1,9 @@
 package fr.jokay03j.myblog.mapper;
 
+import java.util.stream.Collectors;
+
 import fr.jokay03j.myblog.dto.AuthorDTO;
+import fr.jokay03j.myblog.dto.Author.CreateAuthorDTO;
 import fr.jokay03j.myblog.model.Author;
 
 public class AuthorMapper {
@@ -9,9 +12,16 @@ public class AuthorMapper {
     authorDTO.setId(author.getId());
     authorDTO.setFirstname(author.getFirstname());
     authorDTO.setLastname(author.getLastname());
-    // authorDTO.setArticleIds(
-    // author.getArticleIds().stream().map(article ->
-    // article.getId()).collect(Collectors.toList()));
+    authorDTO.setArticles(
+        author.getArticleAuthors().stream().map(article -> ArticleMapper.convert(article.getArticle()))
+            .collect(Collectors.toList()));
     return authorDTO;
+  }
+
+  static public Author toEntity(CreateAuthorDTO authorDTO) {
+    Author author = new Author();
+    author.setFirstname(authorDTO.getFirstname());
+    author.setLastname(authorDTO.getLastname());
+    return author;
   }
 }

@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.jokay03j.myblog.dto.CategoryDTO;
+import fr.jokay03j.myblog.dto.Category.CreateCategoryDTO;
+import fr.jokay03j.myblog.mapper.CategoryMapper;
 import fr.jokay03j.myblog.model.Category;
 import fr.jokay03j.myblog.service.CategoryService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/categories")
@@ -36,7 +39,8 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@RequestBody Category category) {
+    public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CreateCategoryDTO cateboryBody) {
+        Category category = CategoryMapper.toEntity(cateboryBody);
         CategoryDTO createdCategory = this.categoryService.createCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }

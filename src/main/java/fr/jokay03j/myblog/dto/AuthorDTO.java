@@ -6,7 +6,15 @@ public class AuthorDTO {
     private Long id;
     private String firstname;
     private String lastname;
-    private List<Long> articleIds;
+    private List<ArticleDTO> articles;
+
+    public List<ArticleDTO> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<ArticleDTO> articles) {
+        this.articles = articles;
+    }
 
     public Long getId() {
         return id;
@@ -30,13 +38,5 @@ public class AuthorDTO {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
-    }
-
-    public List<Long> getArticleIds() {
-        return articleIds;
-    }
-
-    public void setArticleIds(List<Long> articleIds) {
-        this.articleIds = articleIds;
     }
 }

@@ -4,8 +4,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import fr.jokay03j.myblog.dto.ImageDTO;
+import fr.jokay03j.myblog.dto.Image.CreateImageDTO;
 import fr.jokay03j.myblog.model.Image;
 import fr.jokay03j.myblog.service.ImageService;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class ImageController {
     }
 
     @PostMapping
-    public ResponseEntity<ImageDTO> createImage(@RequestBody Image image) {
+    public ResponseEntity<ImageDTO> createImage(@Valid @RequestBody CreateImageDTO image) {
         ImageDTO savedImage = imageService.create(image);
         return ResponseEntity.status(201).body(savedImage);
     }

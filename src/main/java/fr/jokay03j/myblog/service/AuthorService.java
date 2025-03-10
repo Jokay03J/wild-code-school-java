@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import fr.jokay03j.myblog.dto.AuthorDTO;
+import fr.jokay03j.myblog.dto.Author.CreateAuthorDTO;
 import fr.jokay03j.myblog.exception.ResourceNotFoundException;
 import fr.jokay03j.myblog.mapper.AuthorMapper;
 import fr.jokay03j.myblog.model.Author;
@@ -34,8 +35,9 @@ public class AuthorService {
     return AuthorMapper.convert(author);
   }
 
-  public AuthorDTO create(Author authorBody) {
-    Author savedAuthor = this.authorRepository.save(authorBody);
+  public AuthorDTO create(CreateAuthorDTO authorBody) {
+    Author author = AuthorMapper.toEntity(authorBody);
+    Author savedAuthor = this.authorRepository.save(author);
     return AuthorMapper.convert(savedAuthor);
   }
 

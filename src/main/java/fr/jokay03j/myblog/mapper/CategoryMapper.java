@@ -3,6 +3,7 @@ package fr.jokay03j.myblog.mapper;
 import java.util.stream.Collectors;
 
 import fr.jokay03j.myblog.dto.CategoryDTO;
+import fr.jokay03j.myblog.dto.Category.CreateCategoryDTO;
 import fr.jokay03j.myblog.model.Category;
 
 public class CategoryMapper {
@@ -16,5 +17,11 @@ public class CategoryMapper {
     dto.setUpdatedAt(category.getUpdatedAt());
     return dto;
 
+  }
+
+  static public Category toEntity(CreateCategoryDTO categoryDTO) {
+    Category category = new Category();
+    category.setName(categoryDTO.getName());
+    return category;
   }
 }

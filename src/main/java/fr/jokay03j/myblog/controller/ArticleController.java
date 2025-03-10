@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.jokay03j.myblog.dto.ArticleDTO;
+import fr.jokay03j.myblog.dto.Article.CreateArticleDTO;
 import fr.jokay03j.myblog.model.Article;
 import fr.jokay03j.myblog.service.ArticleService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/articles")
@@ -48,7 +50,7 @@ public class ArticleController {
     }
 
     @PostMapping
-    public ResponseEntity<ArticleDTO> createArticle(@RequestBody Article article) {
+    public ResponseEntity<ArticleDTO> createArticle(@Valid @RequestBody CreateArticleDTO article) {
         ArticleDTO savedArticle = this.articleService.createArticle(article);
         if (savedArticle == null) {
             return ResponseEntity.badRequest().build();

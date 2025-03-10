@@ -1,5 +1,6 @@
 package fr.jokay03j.myblog.mapper;
 
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -7,7 +8,11 @@ import org.springframework.stereotype.Component;
 import fr.jokay03j.myblog.dto.ArticleDTO;
 import fr.jokay03j.myblog.dto.AuthorDTO;
 import fr.jokay03j.myblog.dto.CategoryDTO;
+import fr.jokay03j.myblog.dto.Article.CreateArticleDTO;
 import fr.jokay03j.myblog.model.Article;
+import fr.jokay03j.myblog.model.ArticleAuthor;
+import fr.jokay03j.myblog.model.Author;
+import fr.jokay03j.myblog.model.Category;
 import fr.jokay03j.myblog.model.Image;
 
 @Component
@@ -47,5 +52,30 @@ public class ArticleMapper {
     }
 
     return dto;
+  }
+
+  static public Article toEntity(CreateArticleDTO articleDTO) {
+    Article article = new Article();
+    article.setTitle(articleDTO.getTitle());
+    article.setContent(articleDTO.getContent());
+    Category category = new Category();
+    category.setId(articleDTO.getCategoryId());
+    article.setCategory(category);
+    article.setImages(articleDTO.getImages().stream().map(imageId -> {
+      Image image = new Image();
+      image.setId(imageId.getId());
+      image.setUrl(imageId.getUrl());
+      return image;
+    }).collect(Collectors.toList()));
+    article.setArticleAuthors(articleDTO.getAuthors().stream().map(author -> {
+      ArticleAuthor articleAuthor = new ArticleAuthor();
+      Author authorEntity = new Author();
+      authorEntity.setId(author.getAuthorId());
+      articleAuthor.setAuthor(authorEntity);
+      articleAuthor.setArticle(article);
+      articleAuthor.setContribution(author.getContribution());
+      return articleAuthor;
+    }).collect(Collectors.toList()));
+    return article;
   }
 }

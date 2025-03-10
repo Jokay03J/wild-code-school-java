@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import fr.jokay03j.myblog.dto.ImageDTO;
+import fr.jokay03j.myblog.dto.Image.CreateImageDTO;
 import fr.jokay03j.myblog.exception.ResourceNotFoundException;
 import fr.jokay03j.myblog.mapper.ImageMapper;
 import fr.jokay03j.myblog.model.Image;
@@ -33,7 +34,8 @@ public class ImageService {
     return ImageMapper.convert(image);
   }
 
-  public ImageDTO create(Image image) {
+  public ImageDTO create(CreateImageDTO imageBody) {
+    Image image = ImageMapper.toEntity(imageBody);
     Image savedImage = imageRepository.save(image);
     return ImageMapper.convert(savedImage);
   }

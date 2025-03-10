@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.jokay03j.myblog.dto.ArticleDTO;
+import fr.jokay03j.myblog.dto.Article.CreateArticleDTO;
 import fr.jokay03j.myblog.exception.ResourceNotFoundException;
 import fr.jokay03j.myblog.mapper.ArticleMapper;
 import fr.jokay03j.myblog.model.Article;
@@ -23,25 +25,16 @@ import fr.jokay03j.myblog.repository.ImageRepository;
 
 @Service
 public class ArticleService {
-  private final ArticleRepository articleRepository;
-  private final CategoryRepository categoryRepository;
-  private final ImageRepository imageRepository;
-  private final AuthorRepository authorRepository;
-  private final ArticleAuthorRepository articleAuthorRepository;
-
-  public ArticleService(
-      ArticleRepository articleRepository,
-      ArticleMapper articleMapper,
-      CategoryRepository categoryRepository,
-      ImageRepository imageRepository,
-      AuthorRepository authorRepository,
-      ArticleAuthorRepository articleAuthorRepository) {
-    this.articleRepository = articleRepository;
-    this.categoryRepository = categoryRepository;
-    this.imageRepository = imageRepository;
-    this.authorRepository = authorRepository;
-    this.articleAuthorRepository = articleAuthorRepository;
-  }
+  @Autowired
+  private ArticleRepository articleRepository;
+  @Autowired
+  private CategoryRepository categoryRepository;
+  @Autowired
+  private ImageRepository imageRepository;
+  @Autowired
+  private AuthorRepository authorRepository;
+  @Autowired
+  private ArticleAuthorRepository articleAuthorRepository;
 
   public List<ArticleDTO> getArticles() {
     List<Article> articles = this.articleRepository.findAll();
@@ -56,7 +49,8 @@ public class ArticleService {
     return ArticleMapper.convert(article);
   }
 
-  public ArticleDTO createArticle(Article article) {
+  public ArticleDTO createArticle(CreateArticleDTO articleBody) {
+    Article article = ArticleMapper.toEntity(articleBody);
     article.setCreatedAt(LocalDateTime.now());
     article.setUpdatedAt(LocalDateTime.now());
 
@@ -85,7 +79,6 @@ public class ArticleService {
     if (article.getArticleAuthors() != null) {
       for (ArticleAuthor articleAuthor : article.getArticleAuthors()) {
         Author author = articleAuthor.getAuthor();
-        System.out.println(author);
         if (author == null) {
           return null;
         }
@@ -96,7 +89,6 @@ public class ArticleService {
         articleAuthor.setAuthor(author);
         articleAuthor.setArticle(article);
         articleAuthor.setContribution(articleAuthor.getContribution());
-
       }
     }
     this.articleAuthorRepository.saveAll(article.getArticleAuthors());
