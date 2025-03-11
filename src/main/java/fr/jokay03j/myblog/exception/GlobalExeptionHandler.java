@@ -51,6 +51,14 @@ public class GlobalExeptionHandler {
         new Error(exception, HttpStatus.BAD_REQUEST, request.getRequestURI(), errors),
         HttpStatus.BAD_REQUEST);
   }
+
+  @ExceptionHandler(NotFoundException.class)
+  public ResponseEntity<Error> handleNotFound(NotFoundException exception, HttpServletRequest request) {
+    Map<String, String> errors = new HashMap<>();
+    return new ResponseEntity<Error>(
+        new Error(exception, HttpStatus.NOT_FOUND, request.getRequestURI(), errors),
+        HttpStatus.NOT_FOUND);
+  }
 }
 
 class Error {
