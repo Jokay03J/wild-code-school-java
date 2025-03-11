@@ -1,11 +1,13 @@
 package fr.jokay03j.myblog.service;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import fr.jokay03j.myblog.exception.BadRequestException;
+import fr.jokay03j.myblog.exception.NotFoundException;
 import fr.jokay03j.myblog.model.User;
 import fr.jokay03j.myblog.repository.UserRepository;
 
@@ -33,5 +35,9 @@ public class UserService {
     User savedUser = userRepository.save(user);
     savedUser.setPassword(null); // On ne renvoie pas le mot de passe
     return savedUser;
+  }
+
+  public Optional<User> findById(Long id) {
+    return userRepository.findById(id);
   }
 }
