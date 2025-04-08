@@ -7,7 +7,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import fr.jokay03j.myblog.exception.BadRequestException;
-import fr.jokay03j.myblog.exception.NotFoundException;
 import fr.jokay03j.myblog.model.User;
 import fr.jokay03j.myblog.repository.UserRepository;
 
