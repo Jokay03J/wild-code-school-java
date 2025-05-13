@@ -8,22 +8,37 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import fr.jokay03j.myblog.dto.CategoryDTO;
+import fr.jokay03j.myblog.exception.ResourceNotFoundException;
+import fr.jokay03j.myblog.filter.JwtAuthenticationFilter;
 import fr.jokay03j.myblog.service.CategoryService;
+import fr.jokay03j.myblog.service.CustomUserDetailsService;
+import fr.jokay03j.myblog.service.JwtService;
 
 @WebMvcTest(CategoryController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class CategoryControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
 
-  @Mock
+  @MockitoBean
   private CategoryService categoryService;
+
+  @MockitoBean
+  private JwtService jwtService;
+
+  @MockitoBean
+  private CustomUserDetailsService customUserDetailsService;
+
+  @MockitoBean
+  private JwtAuthenticationFilter jwtAuthenticationFilter;
 
   @Test
   void testGetAllCategories() throws Exception {
@@ -37,7 +52,7 @@ class CategoryControllerTest {
     when(categoryService.getAll()).thenReturn(List.of(category1, category2));
 
     // Act & Assert
-    mockMvc.perform(get("/api/categories"))
+    mockMvc.perform(get("/categories"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(2))
         .andExpect(jsonPath("$[0].name").value("Category 1"))
@@ -53,7 +68,7 @@ class CategoryControllerTest {
     when(categoryService.getCategory(1L)).thenReturn(category);
 
     // Act & Assert
-    mockMvc.perform(get("/api/categories/1"))
+    mockMvc.perform(get("/categories/1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value("Category 1"));
   }
@@ -61,7 +76,7 @@ class CategoryControllerTest {
   @Test
   void testGetCategoryById_CategoryNotFound() throws Exception {
     // Arrange
-    when(categoryService.getCategory(99L)).thenThrow(new RuntimeException("Category not found"));
+    when(categoryService.getCategory(99L)).thenThrow(new ResourceNotFoundException("Category not found"));
 
     // Act & Assert
     mockMvc.perform(get("/api/categories/99"))
